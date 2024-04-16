@@ -17,10 +17,10 @@
         "name": "TestAbility",
         "srcEntry": "./ets/testability/TestAbility.ets",
         "description": "$string:TestAbility_desc",
-        "icon": "$media:icon",
+        "icon": "$media:foreground",
         "label": "$string:TestAbility_label",
         "exported": true,
-        "startWindowIcon": "$media:icon",
+        "startWindowIcon": "$media:foreground",
         "startWindowBackground": "$color:start_window_background",
         "skills": [
           {

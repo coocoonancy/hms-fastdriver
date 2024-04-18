@@ -1,12 +1,12 @@
 // 读写广告配置
 import { preferences } from '@kit.ArkData'
-import { USER_SETTING, USER_SETTING_AD } from '../constants'
+import { TOKEN_KEY, USER_SETTING, USER_SETTING_AD } from '../constants'
 import { AdvertClass } from '../models'
 
-const defaultAd: AdvertClass = {
+export const defaultAd: AdvertClass = {
   showAd: true,
   adTime: 5,
-  adImg: '',
+  adImg: $r('app.media.start'),
   adUrl: ''
 }
 
@@ -31,8 +31,21 @@ export class UserSettingClass {
     await adStore.flush()
   }
 
-  async getUserAd(): Promise<AdvertClass> {
+  // 读取用户的广告配置
+  getUserAd() {
+    const store = this.getStore()
+    return JSON.parse(store.getSync(USER_SETTING_AD, JSON.stringify(defaultAd)) as string) as AdvertClass
+  }
+
+  async setUserToken(token: string) {
     const adStore = await this.getStore()
-    return JSON.parse(await adStore.get(USER_SETTING_AD, JSON.stringify(defaultAd)) as string) as AdvertClass
+    await adStore.put(TOKEN_KEY, token)
+    // 写入磁盘
+    await adStore.flush()
+  }
+
+  async getUserToken(): Promise<string> {
+    const adStore = await this.getStore()
+    return await adStore.get(TOKEN_KEY, '') as string
   }
 }

@@ -1,4 +1,6 @@
 import { TabClass } from '@hms/basic/Index'
+import My from './My/My'
+import TaskTab from './Task/TaskTab'
 
 @Entry
 @Component
@@ -17,7 +19,14 @@ struct Index {
     icon: $r("app.media.ic_tab_btn_mine_nor")
   }]
   @State
+  @Watch('updateName')
   currentIndex: number = 0 // 当前激活项
+  @Provide
+  currentName: string = ""
+
+  updateName() {
+    this.currentName = this.tabsData[this.currentIndex].name
+  }
 
   @Builder
   getTabBar(item: TabClass) {
@@ -39,13 +48,13 @@ struct Index {
       ForEach(this.tabsData, (item: TabClass) => {
         TabContent() {
           if (item.name === 'task') {
-            Text("任务组件")
+            TaskTab()
           }
           else if (item.name === 'message') {
             Text("消息组件")
           }
           else {
-            Text("我的组件")
+            My()
           }
         }.tabBar(this.getTabBar(item))
       })

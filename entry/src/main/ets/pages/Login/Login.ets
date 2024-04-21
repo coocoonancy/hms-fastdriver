@@ -11,8 +11,8 @@ struct Login {
   loading: boolean = false
   @State
   accountForm: LoginFormModel = new LoginFormModel({
-    account: '19957106275',
-    password: 'guo123nancy'
+    account: 'xiaoshida1',
+    password: '123456789'
   })
 
   // 调用登录接口
@@ -24,7 +24,7 @@ struct Login {
       new UserSettingClass(getContext(this)).setUserToken(token) // 存入首选项
       this.loading = false
       router.replaceUrl({
-        url: 'pages/Index'
+        url: 'pages/Index/Index'
       })
     } catch (error) {
     } finally {

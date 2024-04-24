@@ -1,12 +1,22 @@
 import { TaskInfoItem, TaskInfoItemModel } from '../../../models'
+import { router } from '@kit.ArkUI'
 
 @Preview
 @Component
 struct TaskItemCard {
   taskItemData: TaskInfoItemModel = new TaskInfoItemModel({} as TaskInfoItem)
+
   getEnabled() {
     return this.taskItemData.enablePickUp
   }
+
+  onPickUp() {
+    router.pushUrl({
+      url: 'pages/TaskDetail/TaskDetail',
+      params: { id: this.taskItemData.id }
+    })
+  }
+
   build() {
     Column() {
       Row() {
@@ -65,6 +75,9 @@ struct TaskItemCard {
           .fontSize(14)
           .height(32)
           .enabled(this.getEnabled())
+          .onClick(() => {
+            this.onPickUp()
+          })
 
       }.justifyContent(FlexAlign.SpaceBetween).width('100%')
     }

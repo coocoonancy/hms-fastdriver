@@ -4,6 +4,9 @@ import { TaskInfoItem, TaskInfoItemModel } from '../../../models'
 @Component
 struct TaskItemCard {
   taskItemData: TaskInfoItemModel = new TaskInfoItemModel({} as TaskInfoItem)
+  getEnabled() {
+    return this.taskItemData.enablePickUp
+  }
   build() {
     Column() {
       Row() {
@@ -61,6 +64,7 @@ struct TaskItemCard {
           .fontColor($r("app.color.white"))
           .fontSize(14)
           .height(32)
+          .enabled(this.getEnabled())
 
       }.justifyContent(FlexAlign.SpaceBetween).width('100%')
     }

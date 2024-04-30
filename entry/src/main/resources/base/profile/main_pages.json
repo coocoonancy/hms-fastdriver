@@ -4,6 +4,11 @@
     "pages/Start/Start",
     "pages/Login/Login",
     "pages/Setting/Setting",
-    "pages/TaskDetail/TaskDetail"
+    "pages/TaskDetail/TaskDetail",
+    "pages/CarRecord/CarRecord",
+    "pages/Delay/Delay",
+    "pages/ExceptionReport/ExceptionReport",
+    "pages/SelectLocation/SelectLocation",
+    "pages/ExceptionDetail/ExceptionDetail"
   ]
 }

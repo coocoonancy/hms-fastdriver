@@ -77,4 +77,4 @@ struct HmSkeleton {
   }
 }
 
-export default HmSkeleton
+export { HmSkeleton }

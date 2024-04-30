@@ -25,7 +25,7 @@ struct TaskList {
   async getTaskList(append: boolean) {
     const result = await getTaskList(this.queryParams)
     if (append) {
-      this.taskListData = [...this.taskListData, ...result.items]
+      this.taskListData = [...this.taskListData, ...(result.items || [])]
     } else {
       this.taskListData = result.items
     }
@@ -37,7 +37,6 @@ struct TaskList {
     this.queryParams.page = 1;
     await this.getTaskList(false)
   }
-
 
   @Builder
   renderItem(item: object) {
@@ -58,6 +57,7 @@ struct TaskList {
         await this.onRefresh()
       },
     })
+      .height('100%')
     // List() {
     //   ForEach(this.taskListData, (item: TaskInfoItemModel) => {
     //     ListItem() {

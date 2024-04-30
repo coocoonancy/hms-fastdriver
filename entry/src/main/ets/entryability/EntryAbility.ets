@@ -1,10 +1,16 @@
-import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { abilityAccessCtrl, AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { AdvertClass, defaultAd, TOKEN_KEY, UserSettingClass } from '@hms/basic/Index';
 
 export default class EntryAbility extends UIAbility {
-  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
+    let manger = abilityAccessCtrl.createAtManager()
+    await manger.requestPermissionsFromUser(this.context,
+      [
+        'ohos.permission.LOCATION',
+        'ohos.permission.APPROXIMATELY_LOCATION',
+      ])
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
   }
 
@@ -33,6 +39,13 @@ export default class EntryAbility extends UIAbility {
 
     const token = await userSetting.getUserToken()
     AppStorage.setOrCreate(TOKEN_KEY, token)
+
+    // windowStage.getMainWindowSync().setWindowLayoutFullScreen(true)
+    // AppStorage.setOrCreate("topHeight", px2vp(windowStage.getMainWindowSync().getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM)
+    //   .topRect.height)  )
+    // AppStorage.setOrCreate("bottomHeight", px2vp(windowStage.getMainWindowSync().getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR)
+    //   .bottomRect.height)  )
+
 
     if (token) {
       windowStage.loadContent('pages/Index/Index', (err) => {

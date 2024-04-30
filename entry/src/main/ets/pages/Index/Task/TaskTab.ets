@@ -1,5 +1,6 @@
 import { TabClass } from '@hms/basic/Index'
 import TaskList from './TaskList'
+import { TaskListParams, TaskListParamsModel, TaskTypeEnum } from '../../../models'
 
 @Component
 struct TaskTab {
@@ -57,10 +58,18 @@ struct TaskTab {
               TaskList()
 
             } else if (item.name === 'line') {
-
+              TaskList({ queryParams: new TaskListParamsModel({
+                page: 1,
+                pageSize: 5,
+                status: TaskTypeEnum.Line
+              } as TaskListParams) })
             }
             else if (item.name === 'finish') {
-
+              TaskList({ queryParams: new TaskListParamsModel({
+                page: 1,
+                pageSize: 5,
+                status: TaskTypeEnum.Finish
+              } as TaskListParams) })
             }
           }
         })

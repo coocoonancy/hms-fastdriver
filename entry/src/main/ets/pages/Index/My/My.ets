@@ -1,9 +1,8 @@
-import { HmCard, HmCardItem } from '@hms/basic/Index'
+import { HmCard, HmCardItem, HmSkeleton } from '@hms/basic/Index'
 import { promptAction, router } from '@kit.ArkUI'
 import { getUserInfo, getUserTaskInfo } from '../../../api'
 import { UserInfo, UserInfoModel } from '../../../models'
 import { UserTaskInfo, UserTaskInfoModel, UserTaskInfoParamsModel } from '../../../models/user_task'
-import HmSkeleton from '@hms/basic/src/main/ets/components/HmSkeleton'
 
 @Preview
 @Component

@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storePassword": "0000001BF805BC4DB8FB6E288B7996BF92D3D027F6ABDEEBD8764756F1093A15E3861D9461A24F9A40A84D",
+          "certpath": "/Users/coocoonancy/harmonyos/harmonyos_docs/fast-driver/coocoonancy_fastdriver.cer",
+          "keyAlias": "fast_driver",
+          "keyPassword": "0000001B7A2E95FA63C2895C002D8455E886D8307CCE9E2C5573616DF51FE5F09FE0804AC3978A2AEF86A5",
+          "profile": "/Users/coocoonancy/harmonyos/harmonyos_docs/fast-driver/coocoonancy_fastdriverDebug.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/coocoonancy/harmonyos/harmonyos_docs/fast-driver/fast_driver.p12"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",

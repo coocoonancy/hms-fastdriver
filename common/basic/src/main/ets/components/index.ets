@@ -17,3 +17,9 @@ export * from './HmUpload'
 
 export * from './HmPreview'
 
+export * from './HmLoading'
+
+export * from './HmCheckBox'
+
+export * from './HmSelectCard'
+

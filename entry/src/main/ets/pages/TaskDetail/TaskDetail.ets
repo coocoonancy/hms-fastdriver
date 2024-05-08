@@ -20,6 +20,8 @@ import {
 import { deliver, getTaskDetail, pickUp } from '../../api'
 import { common } from '@kit.AbilityKit'
 import { call } from '@kit.TelephonyKit'
+import { MessageEvents, worker } from '@kit.ArkTS'
+import { PostParams } from '../../workers/UploadWorker'
 
 
 @Entry
@@ -255,17 +257,17 @@ struct TaskDetail {
     HmUpload({
       title: '请拍照上传交货货品凭证',
       canUpload: this.taskDetailData.status === TaskTypeEnum.Line,
-      imgList: this.taskDetailData.deliverPictureList || [],
+      imgList: this.taskDetailData.certificatePictureList || [],
       onListChange: (list: ImageList[]) => {
-        this.taskDetailData.deliverPictureList = list
+        this.taskDetailData.certificatePictureList = list
       }
     })
     HmUpload({
       title: '请拍照上传交货货品照片',
       canUpload: this.taskDetailData.status === TaskTypeEnum.Line,
-      imgList: this.taskDetailData.certificatePictureList || [],
+      imgList: this.taskDetailData.deliverPictureList || [],
       onListChange: (list: ImageList[]) => {
-        this.taskDetailData.certificatePictureList = list
+        this.taskDetailData.deliverPictureList = list
       }
     })
   }
@@ -355,8 +357,51 @@ struct TaskDetail {
     .backgroundColor($r('app.color.white'))
   }
 
-  // 去提货
   async btnPickUp() {
+    this.loading.open()
+    let cargoPictureList: ImageList[] = []
+    let cargoPickUpPictureList: ImageList[] = []
+    const checkFile = async () => {
+      if (cargoPickUpPictureList.length && cargoPictureList.length) {
+        const result = await Promise.all([UploadFile(cargoPickUpPictureList), UploadFile(cargoPictureList)])
+        // 提货操作
+        await pickUp(new PickUpParamsModel({
+          id: this.taskDetailData.id,
+          cargoPickUpPictureList: result[0],
+          cargoPictureList: result[1]
+        }))
+        this.getTaskDetail(this.taskDetailData.id) // 重新拉取数据
+        this.scroller.scrollEdge(Edge.Top)
+        this.loading.close()
+        promptAction.showToast({ message: '提货成功' })
+      }
+    }
+
+    const upLoadTask1 = new worker.ThreadWorker("entry/ets/workers/UploadWorker.ets") // 创建worker线程任务
+    const upLoadTask2 = new worker.ThreadWorker("entry/ets/workers/UploadWorker.ets") // 创建worker线程任务
+
+    upLoadTask1.onmessage = (e: MessageEvents) => {
+      const params = e.data as PostParams
+      cargoPickUpPictureList = params.files // 已经压缩完毕的图片
+      checkFile() // 检查是否都完成了
+    }
+    upLoadTask2.onmessage = (e: MessageEvents) => {
+      const params = e.data as PostParams
+      cargoPictureList = params.files // 已经压缩完毕的图片
+      checkFile()
+    }
+    upLoadTask1.postMessage({
+      files: [...this.taskDetailData.cargoPickUpPictureList],
+      filePath: getContext().filesDir
+    }) // 给子线程发消息
+    upLoadTask2.postMessage({
+      files: [...this.taskDetailData.cargoPictureList],
+      filePath: getContext().filesDir
+    }) // 给子线程发消息
+  }
+
+  // 去提货
+  async btnPickUp1() {
     this.loading.open()
     const cargoPictureList = await UploadFile(this.taskDetailData.cargoPictureList)
     const cargoPickUpPictureList = await UploadFile(this.taskDetailData.cargoPickUpPictureList)
@@ -372,6 +417,51 @@ struct TaskDetail {
   }
 
   async btnDeliver() {
+    this.loading.open()
+      const uploadTask1 = new worker.ThreadWorker("entry/ets/workers/UploadWorker.ets") // 子线程1
+      const uploadTask2 = new worker.ThreadWorker("entry/ets/workers/UploadWorker.ets") // 子线程2
+    let certificatePictureList: ImageList[] = []
+    let deliverPictureList: ImageList[] = []
+    uploadTask1.onmessage = (e: MessageEvents) => {
+      const params = e.data as PostParams
+      certificatePictureList = params.files
+      checkFile()
+    }
+    uploadTask2.onmessage = (e: MessageEvents) => {
+      const params = e.data as PostParams
+      deliverPictureList = params.files
+      checkFile()
+    }
+    uploadTask1.postMessage({
+      files: [...this.taskDetailData.certificatePictureList],
+      filePath: getContext().filesDir
+    }) // 发送消息到线程1
+    uploadTask2.postMessage({
+      files: [...this.taskDetailData.deliverPictureList],
+      filePath: getContext().filesDir
+    }) // 发送消息到线程1
+    const checkFile = async () => {
+      if (certificatePictureList.length && deliverPictureList.length) {
+        const res = await Promise.all([UploadFile(certificatePictureList), UploadFile(deliverPictureList)])
+        // 交货操作
+        await deliver(new DeliverParamsTypeModel({
+          id: this.taskDetailData.id,
+          certificatePictureList: res[0],
+          deliverPictureList: res[1]
+        }))
+        // 只需要重新获取数据
+        // 重新获取数据
+        this.getTaskDetail(this.taskDetailData.id) // 重新拉取数据
+        this.scroller.scrollEdge(Edge.Top)
+        this.loading.close()
+        // 滚动到顶部
+        promptAction.showToast({ message: '交货成功' })
+      }
+    }
+  }
+
+  // 交货
+  async btnDeliver1() {
     this.loading.open()
     const certificatePictureList = await UploadFile(this.taskDetailData.certificatePictureList) // 传入提货凭证
     const deliverPictureList = await UploadFile(this.taskDetailData.deliverPictureList) // 货品照片
@@ -461,6 +551,7 @@ struct TaskDetail {
             }
             if (this.taskDetailData.status === TaskTypeEnum.Waiting
               || this.taskDetailData.status === TaskTypeEnum.Delivered
+              || this.taskDetailData.status === TaskTypeEnum.Finish
             ) {
               HmToggleCard({ title: '提货信息' }) {
                 // 上传组件 基础组件
@@ -470,6 +561,7 @@ struct TaskDetail {
             }
             if (this.taskDetailData.status === TaskTypeEnum.Line
               || this.taskDetailData.status === TaskTypeEnum.Delivered
+              || this.taskDetailData.status === TaskTypeEnum.Finish
             ) {
               HmToggleCard({ title: '交货信息' }) {
                 // 上传组件 基础组件
@@ -486,7 +578,9 @@ struct TaskDetail {
         .layoutWeight(1)
 
         // 它需要放在底部 不能在滚动容器中
-        this.getBottomBtn()
+        if (this.taskDetailData.status !== TaskTypeEnum.Finish) {
+          this.getBottomBtn() // 底部按钮结构
+        }
       }
       else {
         // 显示骨架屏

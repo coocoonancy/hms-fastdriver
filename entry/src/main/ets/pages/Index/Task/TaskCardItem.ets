@@ -8,7 +8,7 @@ struct TaskItemCard {
 
   getEnabled() {
     // 提货的时候可以点按钮
-    if(this.taskItemData.enablePickUp) {
+    if (this.taskItemData.enablePickUp) {
       return true
     }
     // 判断当然的状态
@@ -97,23 +97,40 @@ struct TaskItemCard {
           Text("2022.05.04 13:00").fontSize(14).fontColor($r('app.color.text_secondary')).margin({ top: 4 })
         }.alignItems(HorizontalAlign.Start)
 
-        Button(this.getBtnText(), { type: ButtonType.Capsule })
-          .backgroundColor($r('app.color.primary'))
-          .fontColor($r("app.color.white"))
-          .fontSize(14)
-          .height(32)
-          .enabled(this.getEnabled())
-          .onClick(() => {
-            this.onPickUp()
-          })
-
+        if (parseInt(this.taskItemData.status) !== TaskTypeEnum.Finish) {
+          Button(this.getBtnText(), { type: ButtonType.Capsule })
+            .backgroundColor($r('app.color.primary'))
+            .fontColor($r("app.color.white"))
+            .fontSize(14)
+            .height(32)
+            .enabled(this.getEnabled())
+            .onClick(() => {
+              this.onPickUp()
+            })
+        }
       }.justifyContent(FlexAlign.SpaceBetween).width('100%')
     }
     .margin({ left: 15, right: 15, top: 15 })
-    .padding({ left: 19.5, right: 19.5, bottom: 18.5, top: 18.5 })
-    .borderRadius(10)
-    .backgroundColor($r('app.color.white'))
 
+    .padding({ left: 19.5, right: 19.5, bottom: 18.5, top: 18.5 })
+
+    .borderRadius
+    (10
+    )
+    .backgroundColor
+    ($r
+    ('app.color.white'
+    ))
+    .onClick(() => {
+      if (parseInt(this.taskItemData.status) === TaskTypeEnum.Finish) {
+        router.pushUrl({
+          url: 'pages/TaskDetail/TaskDetail',
+          params: {
+            id: this.taskItemData.id
+          }
+        })
+      }
+    })
   }
 }
 
